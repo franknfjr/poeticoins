@@ -1,0 +1,1 @@
+alias Poeticoins.{Product, Trade}
