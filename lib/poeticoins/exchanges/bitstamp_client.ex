@@ -1,21 +1,19 @@
 defmodule Poeticoins.Exchanges.BitstampClient do
-  use GenServer
   alias Poeticoins.{Trade, Product}
+  alias Poeticoins.Exchanges.Client
+  require Client
+
   @exchange_name "bitstamp"
+  @exchange_host 'ws.bitstamp.net'
+
   @required_fields ~w(amount_str price_str timestamp)
 
-  def start_link(currency_pairs, opts \\ []) do
-    GenServer.start_link(__MODULE__, currency_pairs, opts)
-  end
-
-  def init(currency_pairs) do
-    state = %{
-      currency_pairs: currency_pairs,
-      conn: nil
-    }
-
-    {:ok, state, {:continue, :connect}}
-  end
+  Client.defclient(
+    exchange_name: @exchange_name,
+    host: @exchange_host,
+    port: 443,
+    currency_pairs: ["btcusd", "ethusd", "ltcusd", "btceur", "etheur", "ltceur"]
+  )
 
   def subscribe(state) do
     state.currency_pairs
@@ -55,48 +53,7 @@ defmodule Poeticoins.Exchanges.BitstampClient do
 
   def message_to_trade(_msg), do: {:error, :invalid_trade_message}
 
-  @spec validate_required(map(), [String.t()]) :: :ok | {:error, {String.t(), :required}}
-  def validate_required(msg, keys) do
-    required_key = Enum.find(keys, fn k -> is_nil(msg[k]) end)
-
-    if is_nil(required_key),
-      do: :ok,
-      else: {:error, {required_key, :required}}
-  end
-
-  def handle_info({:gun_up, conn, :http}, %{conn: conn} = state) do
-    :gun.ws_upgrade(state.conn, "/")
-    {:noreply, state}
-  end
-
-  def handle_info(
-        {:gun_upgrade, conn, _ref, ["websocket"], _headers},
-        %{conn: conn} = state
-      ) do
-    subscribe(state)
-    {:noreply, state}
-  end
-
-  def handle_info(
-        {:gun_ws, conn, _ref, {:text, msg} = _frame},
-        %{conn: conn} = state
-      ) do
-    msg
-    |> Jason.decode!()
-    |> handle_ws_message(state)
-  end
-
-  def handle_continue(:connect, state) do
-    updated_state = connect(state)
-    {:noreply, updated_state}
-  end
-
-  def connect(state) do
-    {:ok, conn} = :gun.open(server_host(), server_port(), conn_opts())
-    %{state | conn: conn}
-  end
-
-  defp subscription_frames(currency_pairs) do
+  def subscription_frames(currency_pairs) do
     Enum.map(currency_pairs, &subscription_frame/1)
   end
 
@@ -111,23 +68,6 @@ defmodule Poeticoins.Exchanges.BitstampClient do
       |> Jason.encode!()
 
     {:text, msg}
-  end
-
-  defp server_host, do: 'ws.bitstamp.net'
-  defp server_port, do: 443
-
-  defp conn_opts do
-    %{
-      protocols: [:http],
-      transport: :tls,
-      transport_opts: [
-        verify: :verify_peer,
-        cacertfile: :certifi.cacertfile(),
-        customize_hostname_check: [
-          match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
-        ]
-      ]
-    }
   end
 
   defp timestamp_to_datetime(ts) do

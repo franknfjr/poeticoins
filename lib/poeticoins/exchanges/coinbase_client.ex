@@ -1,11 +1,18 @@
 defmodule Poeticoins.Exchanges.CoinbaseClient do
   alias Poeticoins.Exchanges.Client
   alias Poeticoins.{Trade, Product}
-  import Client, only: [validate_required: 2]
-  @behaviour Client
+  require Client
 
   @exchange_name "coinbase"
+  @exchange_host 'ws-feed.exchange.coinbase.com'
   @required_fields ~w(product_id time price last_size)
+
+  Client.defclient(
+    exchange_name: @exchange_name,
+    host: @exchange_host,
+    port: 443,
+    currency_pairs: ["BTC-USD", "ETH-USD", "LTC-USD", "BTC-EUR", "ETH-EUR", "LTC-EUR"]
+  )
 
   @impl true
   def handle_ws_message(%{"type" => "ticker"} = msg, state) do
@@ -51,13 +58,4 @@ defmodule Poeticoins.Exchanges.CoinbaseClient do
 
     [{:text, msg}]
   end
-
-  @impl true
-  def exchange_name, do: @exchange_name
-
-  @impl true
-  def server_host, do: 'ws-feed.exchange.coinbase.com'
-
-  @impl true
-  def server_port, do: 443
 end
