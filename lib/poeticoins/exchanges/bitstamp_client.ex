@@ -1,5 +1,5 @@
 defmodule Poeticoins.Exchanges.BitstampClient do
-  alias Poeticoins.{Trade, Product}
+  alias Poeticoins.{Trade, Product, Exchanges}
   alias Poeticoins.Exchanges.Client
   require Client
 
@@ -22,11 +22,8 @@ defmodule Poeticoins.Exchanges.BitstampClient do
   end
 
   def handle_ws_message(%{"event" => "trade"} = msg, state) do
-    _trade =
-      msg
-      |> message_to_trade()
-      |> IO.inspect(label: "trade")
-
+    {:ok, trade} = message_to_trade(msg)
+    Exchanges.broadcast(trade)
     {:noreply, state}
   end
 
@@ -40,12 +37,13 @@ defmodule Poeticoins.Exchanges.BitstampClient do
       when is_map(data) do
     with :ok <- validate_required(data, @required_fields),
          {:ok, traded_at} <- timestamp_to_datetime(data["timestamp"]) do
-      Trade.new(
-        product: Product.new(@exchange_name, currency_pair),
-        price: data["price_str"],
-        volume: data["amount_str"],
-        traded_at: traded_at
-      )
+      {:ok,
+       Trade.new(
+         product: Product.new(@exchange_name, currency_pair),
+         price: data["price_str"],
+         volume: data["amount_str"],
+         traded_at: traded_at
+       )}
     else
       {:error, _reason} = error -> error
     end
