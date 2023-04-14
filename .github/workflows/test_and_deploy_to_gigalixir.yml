@@ -3,11 +3,11 @@ on: push
 
 jobs:
   test: 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         otp: [24]
-        elixir: [1.5]
+        elixir: [1.7]
     steps:
     - uses: actions/checkout@v2
     - uses: erlef/setup-elixir@v1
@@ -52,7 +52,7 @@ jobs:
     needs: test
     
     if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     
     - uses: actions/checkout@v2
