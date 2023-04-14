@@ -4,16 +4,14 @@ on: push
 jobs:
   test: 
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        otp: ["24.0"]
-        elixir: ["1.7.1"]
+
     steps:
-    - uses: actions/checkout@v2
-    - uses: erlef/setup-beam@v1
-      with: 
-        otp-version: ${{ matrix.otp }}
-        elixir-version: ${{ matrix.elixir }}
+    - name: Set up Elixir
+      uses: erlef/setup-beam@v1
+      with:
+        elixir-version: "1.14.0"
+        otp-version: "25.0"
+
     - name: Setup Node
       uses: actions/setup-node@v1
       with:
