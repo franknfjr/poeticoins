@@ -3,7 +3,7 @@ on: push
 
 jobs:
   test: 
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       matrix:
         otp: [23.3.2]
@@ -28,7 +28,7 @@ jobs:
     needs: test
     
     if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
     
     - uses: actions/checkout@v2
