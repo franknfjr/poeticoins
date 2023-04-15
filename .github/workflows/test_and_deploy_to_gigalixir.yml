@@ -3,43 +3,21 @@ on: push
 
 jobs:
   test: 
-    runs-on: ubuntu-latest
-
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        otp: [23.3.2]
+        elixir: [1.13.3]
     steps:
-    - name: Set up Elixir
-      uses: erlef/setup-beam@v1
-      with:
-        elixir-version: "1.14.0"
-        otp-version: "25.0"
-
+    - uses: actions/checkout@v2
+    - uses: actions/setup-elixir@v1
+      with: 
+        otp-version: ${{ matrix.otp }}
+        elixir-version: ${{ matrix.elixir }}
     - name: Setup Node
       uses: actions/setup-node@v1
       with:
-        node-version: 14.17.0
-
-    - name: Cache Elixir deps
-      uses: actions/cache@v1
-      id: deps-cache
-      with:
-        path: deps
-        key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
-
-    - name: Cache Elixir _build
-      uses: actions/cache@v1
-      id: build-cache
-      with:
-        path: _build
-        key: ${{ runner.os }}-build-${{ matrix.otp }}-${{ matrix.elixir }}-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }} 
-
-    - name: Cache Node modules
-      uses: actions/cache@v1
-      id: node-cache
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('assets/**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
-
+        node-version: 14.16.0
     - name: Install deps
       run: |
         mix deps.get
@@ -49,22 +27,23 @@ jobs:
   deploy:
     needs: test
     
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-18.04
     steps:
     
     - uses: actions/checkout@v2
       with:
-        ref: master
+        ref: main
         fetch-depth: 0
+    
     - uses: actions/setup-python@v2
       with: 
         python-version: "3.8.1"
 
-    - uses: mhanberg/gigalixir-action@v0.6.2
+    - uses: mhanberg/gigalixir-action@v0.4.3
       with:
         GIGALIXIR_USERNAME: ${{ secrets.GIGALIXIR_USERNAME }}
         GIGALIXIR_PASSWORD: ${{ secrets.GIGALIXIR_PASSWORD }}
         SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         GIGALIXIR_APP: ${{ secrets.GIGALIXIR_APP }}
-        MIGRATIONS: false 
+        MIGRATIONS: false
