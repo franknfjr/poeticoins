@@ -6,8 +6,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        otp: [24.0]
-        elixir: [1.7.1]
+        otp: [25.0]
+        elixir: [1.14.0]
     steps:
     - name: Set up Elixir
       uses: erlef/setup-beam@v1
