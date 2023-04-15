@@ -2,46 +2,83 @@ name: Test and Deploy
 on: push
 
 jobs:
-  test: 
+  static_analysis:
+    name: Static Analysis
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        otp: [25.0]
-        elixir: [1.14.3]
+
     steps:
-    - name: Set up Elixir
-      uses: erlef/setup-beam@v1
-      with:
-        elixir-version: ${{ matrix.elixir }}
-        otp-version: ${{ matrix.otp }}
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Setup Node
-      uses: actions/setup-node@v1
-      with:
-        node-version: 14.17.0
+      - name: Set up Elixir
+        uses: erlef/setup-elixir@v1
+        with:
+          elixir-version: '1.13.1'
+          otp-version: '24.1'
 
-    - uses: actions/cache@v1
-      id: mix-cache-tests
-      with:
-        path: deps
-        key: ${{ runner.os }}-${{ matrix.otp }}-${{ matrix.elixir }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}
-    - name: Install Mix Dependencies
-      if: steps.mix-cache-tests.outputs.cache-hit != 'true'
-      run: |
-        mix local.rebar --force
-        mix local.hex --force
-        mix deps.get
+      - name: Restore dependencies cache
+        uses: actions/cache@v2
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-v2-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-v2-
 
-    - name: Cache Node modules
-      uses: actions/cache@v1
-      id: node-cache
-      with:
-        path: ~/.npm
-        key: ${{ runner.os }}-node-${{ hashFiles('assets/**/package-lock.json') }}
-        restore-keys: |
-          ${{ runner.os }}-node-
+      - name: Setting up SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: |
+            ${{ secrets.MACHINE_USER_SSH_KEY }}
 
-    - run: mix test
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: Restore PLT cache
+        uses: actions/cache@v2
+        with:
+          path: priv/plts
+          key: ${{ runner.os }}-mix-v2-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-v2-
+
+      - name: Mix Formatter
+        run: mix format --check-formatted
+
+      - name: Check for compiler warnings
+        run: mix compile --warnings-as-errors
+
+  unit_test:
+    name: Run ExUnit tests (lib)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Elixir
+        uses: erlef/setup-elixir@v1
+        with:
+          elixir-version: '1.13.1'
+          otp-version: '24.1'
+
+      - name: Restore dependencies cache
+        uses: actions/cache@v2
+        with:
+          path: deps
+          key: ${{ runner.os }}-mix-v2-${{ hashFiles('**/mix.lock') }}
+          restore-keys: ${{ runner.os }}-mix-v2-
+
+      - name: Setting up SSH
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: |
+            ${{ secrets.MACHINE_USER_SSH_KEY }}
+
+      - name: Install dependencies
+        run: mix deps.get
+
+      - name: ExUnit tests (library)
+        env:
+          MIX_ENV: test
+        run: mix test
   deploy:
     needs: test
     
