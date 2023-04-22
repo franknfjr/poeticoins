@@ -5,23 +5,25 @@ $blue-text-color: #262f67;
     background-color: auto;
     color: white;
   }
+
   to {
     background-color: white;
     color: $blue-text-color
   }
 }
+
 .blink {
-	text-decoration: blink;
-	-webkit-animation-name: blinker;
-	-webkit-animation-duration: 0.2s;
-	-webkit-animation-iteration-count:1;
-	-webkit-animation-timing-function:ease-in-out;
-	-webkit-animation-direction: alternate;
+  text-decoration: blink;
+  -webkit-animation-name: blinker;
+  -webkit-animation-duration: 0.2s;
+  -webkit-animation-iteration-count: 1;
+  -webkit-animation-timing-function: ease-in-out;
+  -webkit-animation-direction: alternate;
 }
 
 
 html {
-  background: url(/images/background.svg) no-repeat center center fixed; 
+  background: url(/images/background.svg) no-repeat center center fixed;
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;
@@ -42,7 +44,7 @@ body {
   position: relative;
   width: 95%;
   max-width: 95%;
-  
+
   margin-left: auto;
   margin-right: auto;
 }
@@ -86,11 +88,11 @@ body {
 
   width: 310px;
   height: 200px;
-  
+
   margin: 20px;
   padding: 15px;
   padding-top: 0px;
-  
+
   border-radius: 5px;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   background: linear-gradient(180deg, #1C498D 0%, #272D63 100%);
@@ -106,37 +108,39 @@ body {
     border: none;
     background-color: transparent;
     color: white;
-    opacity: 0.8;    
+    opacity: 0.8;
 
     &:hover {
       font-weight: bold;
       cursor: pointer;
     }
-  }  
+  }
 
   .currency-container {
     position: absolute;
     top: 15px;
     left: 15px;
-    
+
     img.icon {
       display: inline-block;
       vertical-align: middle;
-    
+
       width: 32px;
       height: 32px;
       background-color: #B8D2EA;
       border: 3px solid #B8D2EA;
       border-radius: 50%;
     }
+
     .crypto-name {
       display: inline-block;
       vertical-align: middle;
       margin-left: 0.5em;
       font-weight: 800;
-      font-size: 1.2em;      
+      font-size: 1.2em;
     }
   }
+
   .product-id {
     position: absolute;
     left: 15px;
@@ -157,6 +161,7 @@ body {
         &.active {
           color: white;
         }
+
         text-transform: uppercase;
         color: #616A8B; //disabled by default
         display: inline-block;
@@ -164,7 +169,7 @@ body {
         margin-left: 3px;
         font-weight: 400;
       }
-      
+
     }
 
     .price {
@@ -176,7 +181,7 @@ body {
   }
 
   .exchange-name {
-    position: absolute;  
+    position: absolute;
     bottom: 15px;
     left: 15px;
     font-size: 1em;
@@ -184,7 +189,7 @@ body {
   }
 
   .trade-time {
-    position: absolute;  
+    position: absolute;
     bottom: 15px;
     right: 15px;
     font-size: 0.9em;
@@ -226,7 +231,7 @@ body {
     // display: none;
     background: white;
     font-family: 'Nunito';
-    margin-top:5px;
+    margin-top: 5px;
     height: 40px;
     border: 0px;
     font-size: 0.8em;
@@ -236,7 +241,7 @@ body {
   button[type="submit"] {
     background-color: rgb(62, 145, 255);
     border: 0;
-    padding:0;
+    padding: 0;
     vertical-align: middle;
     color: white;
     height: 40px;
@@ -247,9 +252,12 @@ body {
 }
 
 .chart-container {
-  margin-top: 80px;
+  position: absolute;
+  margin-top: 100px;
   margin-left: auto;
   margin-right: auto;
+  margin-bottom: auto;
+
 }
 
 .powered-by {
@@ -257,7 +265,7 @@ body {
   top: 60%;
   right: 0;
   transform: rotate(-90deg) translateY(77px);
-  
+
   background: #1C498D;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 

@@ -4,21 +4,22 @@ defmodule Poeticoins.Application do
   @moduledoc false
 
   use Application
+  @app_env Mix.env()
 
   def start(_type, _args) do
-    children = [
-      # Start the Telemetry supervisor
-      PoeticoinsWeb.Telemetry,
-      # Start the PubSub system
-      {Phoenix.PubSub, name: Poeticoins.PubSub},
-      {Poeticoins.Historical, name: Poeticoins.Historical},
-      {Poeticoins.Exchanges.Supervisor, name: Poeticoins.Exchanges.Supervisor},
-
-      # Start the Endpoint (http/https)
-      PoeticoinsWeb.Endpoint
-      # Start a worker by calling: Poeticoins.Worker.start_link(arg)
-      # {Poeticoins.Worker, arg}
-    ]
+    children =
+      [
+        # Start the Telemetry supervisor
+        PoeticoinsWeb.Telemetry,
+        # Start the PubSub system
+        {Phoenix.PubSub, name: Poeticoins.PubSub},
+        {Poeticoins.Historical, name: Poeticoins.Historical},
+        # Start the Endpoint (http/https)
+        PoeticoinsWeb.Endpoint
+        # Start a worker by calling: Poeticoins.Worker.start_link(arg)
+        # {Poeticoins.Worker, arg}
+      ] ++
+        exchanges_supervisor_unless_testing()
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
@@ -31,5 +32,11 @@ defmodule Poeticoins.Application do
   def config_change(changed, _new, removed) do
     PoeticoinsWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp exchanges_supervisor_unless_testing do
+    if @app_env == :test,
+      do: [],
+      else: [{Poeticoins.Exchanges.Supervisor, name: Poeticoins.Exchanges.Supervisor}]
   end
 end
