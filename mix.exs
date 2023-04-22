@@ -46,7 +46,8 @@ defmodule Poeticoins.MixProject do
       {:certifi, "~> 2.8"},
       {:gun, "~> 1.3"},
       {:cowlib, "~> 2.11.0", override: true},
-      {:dialyxir, "~> 1.0", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.0", only: [:dev], runtime: false},
+      {:tzdata, "~> 1.1"}
     ]
   end
 

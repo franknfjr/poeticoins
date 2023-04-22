@@ -12,6 +12,7 @@ defmodule PoeticoinsWeb.ProductComponent do
 
     socket =
       assign(socket,
+        timezone: assigns.timezone,
         product: product,
         trade: Poeticoins.get_last_trade(product)
       )
@@ -52,7 +53,7 @@ defmodule PoeticoinsWeb.ProductComponent do
     </div>
 
     <div class="trade-time">
-      <%= human_datetime(@trade.traded_at) %>
+      <%= human_datetime(@trade.traded_at, @timezone) %>
     </div>
     </div>
     """
