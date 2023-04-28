@@ -17,9 +17,13 @@ import { Socket } from "phoenix"
 import NProgress from "nprogress"
 import { LiveSocket } from "phoenix_live_view"
 import { ChartHook } from "./chart"
+import { StockChartHook } from "./high_chart"
+import { TradeHistoryHook } from "./trade_history"
 
 let Hooks = {
-    Chart: ChartHook
+    Chart: ChartHook,
+    HighChart: StockChartHook,
+    TradeHistory: TradeHistoryHook
 }
 
 let timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
