@@ -1,6 +1,5 @@
 defmodule PoeticoinsWeb.CryptoDashboardLive do
   use PoeticoinsWeb, :live_view
-  alias Poeticoins.Product
   import PoeticoinsWeb.ProductHelpers
   require Logger
 
@@ -124,11 +123,6 @@ defmodule PoeticoinsWeb.CryptoDashboardLive do
   defp grouped_products_by_exchange_name do
     Poeticoins.available_products()
     |> Enum.group_by(& &1.exchange_name)
-  end
-
-  defp product_from_string(product_id) do
-    [exchange_name, currency_pair] = String.split(product_id, ":")
-    Product.new(exchange_name, currency_pair)
   end
 
   defp get_timezone_from_connection(socket) do
