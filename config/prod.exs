@@ -13,6 +13,14 @@ config :poeticoins, PoeticoinsWeb.Endpoint,
   url: [host: "poeticoins-app-dev.gigalixirapp.com", port: 80],
   cache_static_manifest: "priv/static/cache_manifest.json"
 
+config :poeticoins, :children, [
+  PoeticoinsWeb.Telemetry,
+  {Phoenix.PubSub, name: Poeticoins.PubSub},
+  {Poeticoins.Historical, name: Poeticoins.Historical},
+  PoeticoinsWeb.Endpoint,
+  {Poeticoins.Exchanges.Supervisor, name: Poeticoins.Exchanges.Supervisor}
+]
+
 # Do not print debug messages in production
 config :logger, level: :info
 
